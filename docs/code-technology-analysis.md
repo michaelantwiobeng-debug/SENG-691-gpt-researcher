@@ -4,6 +4,12 @@
 **Prepared by:** Michael Obeng Antwi  
 **Status:** Phase 1 draft for team review
 
+## Repository Baseline
+
+The team's local repository was verified on October 24, 2026. It was on the `main` branch with a clean working tree. The recorded baseline is GPT Researcher version `0.14.7`, requiring Python `3.11` or later, at commit `6f998577`, dated August 23, 2026. The commit message is `Merge pull request #2079 from assafelovic/feat/retriever-requires-scraping`.
+
+The local repository has two configured remotes. `origin` points to Michael Obeng Antwi's personal fork at `michaelantwiobeng-debug/SENG-691-gpt-researcher`, while `team` points to the shared repository at `umbc-seng691-team/SENG-691-gpt-researcher`. This version and commit identifier should be included in the Phase 1 report and demonstration so the submitted results can be reproduced against the same code state.
+
 ## 1. System Purpose
 
 GPT Researcher is an open source autonomous research agent that accepts a research question, plans how to investigate it, gathers information from web or document sources, evaluates and summarizes the material, and produces a cited report. Its main value is that it turns a broad research request into a repeatable workflow rather than relying on one prompt and one model response.
@@ -33,7 +39,7 @@ The design is asynchronous so searches and network calls can run without blockin
 
 | Layer | Main technology | Purpose and reason for use |
 |---|---|---|
-| Core language | Python 3.12+ | Strong AI ecosystem, readable code, asynchronous networking, and broad library support. |
+| Core language | Python 3.11+ for the team's version | Strong AI ecosystem, readable code, asynchronous networking, and broad library support. |
 | Agent and model integration | LangChain | Provides common interfaces for language models, prompts, tools, document processing, and model providers. |
 | Workflow orchestration | LangGraph | Represents multi-step and multiagent research as a controlled graph with state, branching, and repeatable transitions. |
 | Model provider abstraction | LiteLLM and provider packages | Allows the project to use different hosted or local language models without rewriting the complete workflow. |
@@ -76,7 +82,23 @@ The application processes untrusted web content and user supplied research queri
 
 A public repository issue reported reflected cross site scripting through research task names in certain earlier versions. Our team should inspect the exact version in our fork and test the relevant frontend and WebSocket rendering path before stating whether the issue affects our implementation.
 
-## 7. Phase 1 Assessment
+## 7. What Could Have Been Done Differently
+
+The current architecture favors flexibility by combining several abstraction layers, including LangChain, LangGraph, model-provider packages, retrievers, FastAPI, and a separate frontend. This makes the system highly configurable, but it also increases dependency management, debugging difficulty, and the number of places where failures can occur. A smaller standard workflow could use FastAPI, direct model-provider interfaces, and a limited retriever layer, while reserving LangGraph and multiagent coordination for research tasks that clearly benefit from them.
+
+Citation quality could also be treated as a separate verification stage instead of assuming that a retrieved source supports the statement beside its citation. A stronger design would map each important claim to supporting passages, score source credibility and freshness, and flag claims that lack adequate evidence. This approach would support the team's proposed credibility-evaluation feature.
+
+Security and observability could be more prominent in the default architecture. Retrieved web content should be treated as untrusted input, browser output should be sanitized, external tools should have limited permissions, and research runs should record the model, retriever, configuration, execution time, token usage, and failures. These controls would make the system easier to audit, reproduce, and troubleshoot.
+
+## 8. Lessons Learned
+
+Analyzing the repository showed that an AI agent is more than a language model. GPT Researcher combines planning, tool use, retrieval, filtering, state management, and report generation into a coordinated workflow. The reliability of the final answer therefore depends on the complete pipeline, especially the quality of the retrieved evidence and the way that evidence is connected to citations.
+
+The analysis also showed that flexibility creates trade-offs. Supporting many models, retrievers, interfaces, and multiagent roles makes the application adaptable, but it increases cost, configuration complexity, and testing requirements. Multiagent operation should therefore be selected when specialization and review provide a measurable benefit.
+
+Finally, the Git branch, commit, pull-request, and automated-check workflow demonstrated why version control is essential for group development. Recording version `0.14.7` and commit `6f998577` gives the team a shared, reproducible baseline. A complete local research run still needs to be confirmed and documented by the team; its model, retriever, inputs, output, citations, runtime, and any errors should be added to the final Phase 1 report.
+
+## 9. Phase 1 Assessment
 
 GPT Researcher is a suitable foundation for the group project because it already contains visible agent behavior, a clear planning and execution process, multiple integration points, and a report that can be demonstrated. It also gives the team several realistic areas for enhancement, including source ranking, stale information warnings, stronger citation verification, clearer execution logs, security controls, and comparison of changes between research runs.
 
